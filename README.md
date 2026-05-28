@@ -1,6 +1,26 @@
 # cluster-health-operator
 
+![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
+![Go Version](https://img.shields.io/badge/go-1.22+-blue.svg)
+![Kubernetes](https://img.shields.io/badge/kubernetes-1.25+-blue.svg)
+![OpenShift](https://img.shields.io/badge/openshift-4.10+-red.svg)
+![Status](https://img.shields.io/badge/status-alpha-orange.svg)
+
 A production-grade Kubernetes/OpenShift Operator for unified cluster health monitoring.
+
+## Problem
+
+No existing operator covers all major cluster health domains in one 
+configurable, schedulable, CRD-driven package:
+
+| Existing Tool | Gap |
+|---|---|
+| Insights Operator | Cloud-connected only, no custom scope |
+| Cluster Observability Operator | Control plane only, no ArgoCD/MCPs |
+| K8sGPT | AI narrative, not structured scheduled reports |
+| Node Health Check | Nodes + remediation only |
+
+`cluster-health-operator` was built to fill this gap.
 
 ## Overview
 
