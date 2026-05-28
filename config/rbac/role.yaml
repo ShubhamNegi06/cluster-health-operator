@@ -1,32 +1,60 @@
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: manager-role
 rules:
-- apiGroups:
-  - healthcheck.healthcheck.io
-  resources:
-  - clusterhealthchecks
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - healthcheck.healthcheck.io
-  resources:
-  - clusterhealthchecks/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - healthcheck.healthcheck.io
-  resources:
-  - clusterhealthchecks/status
-  verbs:
-  - get
-  - patch
-  - update
+
+# ── Our own CRDs ────────────────────────────────────────────────────────────
+- apiGroups: ["healthcheck.io"]
+  resources: ["clusterhealthchecks", "clusterhealthreports"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+- apiGroups: ["healthcheck.io"]
+  resources: ["clusterhealthchecks/status", "clusterhealthreports/status"]
+  verbs: ["get", "update", "patch"]
+
+- apiGroups: ["healthcheck.io"]
+  resources: ["clusterhealthchecks/finalizers"]
+  verbs: ["update"]
+
+# ── Core Kubernetes resources ────────────────────────────────────────────────
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
+
+# ── Apps resources (for customProjects check) ────────────────────────────────
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets", "daemonsets"]
+  verbs: ["get", "list", "watch"]
+
+# ── OpenShift ClusterOperators ───────────────────────────────────────────────
+- apiGroups: ["config.openshift.io"]
+  resources: ["clusteroperators"]
+  verbs: ["get", "list", "watch"]
+
+# ── OpenShift MCPs ───────────────────────────────────────────────────────────
+- apiGroups: ["machineconfiguration.openshift.io"]
+  resources: ["machineconfigpools"]
+  verbs: ["get", "list", "watch"]
+
+# ── ArgoCD Applications ──────────────────────────────────────────────────────
+- apiGroups: ["argoproj.io"]
+  resources: ["applications", "applicationsets"]
+  verbs: ["get", "list", "watch"]
+
+# ── Leader election ──────────────────────────────────────────────────────────
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create", "patch"]
