@@ -1,0 +1,71 @@
+apiVersion: healthcheck.io/v1alpha1
+kind: ClusterHealthCheck
+metadata:
+  name: daily-health
+spec:
+  schedule: "0 7 * * *"
+
+  checks:
+    etcd:
+      enabled: true
+      dbSizeLimitMB: 4000
+      leaderChangesLimit: 5
+
+    apiServer:
+      enabled: true
+      latencyThresholdMs: 1000
+      errorRatePercent: 5
+
+    nodes:
+      enabled: true
+      checkDiskPressure: true
+      checkMemoryPressure: true
+      checkPIDPressure: true
+      checkNotReady: true
+
+    clusterOperators:
+      enabled: true
+
+    mcps:
+      enabled: true
+
+    infraPods:
+      enabled: true
+      namespaces:
+        - kube-system
+        - local-path-storage
+      podSelectors:
+        - namespace: kube-system
+          labelSelector: "component=etcd"
+
+    argocd:
+      enabled: false          # disabled for kind, no ArgoCD installed
+      namespace: argocd
+      checkApplications: true
+      alertOn:
+        - Degraded
+        - Unknown
+
+    customProjects:
+      enabled: true
+      projects:
+        - name: kube-system-check
+          namespace: kube-system
+          checkDeployments: true
+          checkDaemonSets: true
+
+  notifications:
+    email:
+      enabled: false
+      smtp: "smtp.example.com:587"
+      from: "healthcheck@example.com"
+      to:
+        - "shubham@example.com"
+      onStatus:
+        - Warning
+        - Critical
+
+  reporting:
+    prometheusMetrics: true
+    storeReports: true
+    retentionDays: 30

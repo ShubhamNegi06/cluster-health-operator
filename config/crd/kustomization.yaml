@@ -1,0 +1,17 @@
+resources:
+- bases/healthcheck.io_clusterhealthchecks.yaml
+- bases/healthcheck.io_clusterhealthreports.yaml
+#+kubebuilder:scaffold:crdkustomizeresource
+
+# patches:
+# - path: patches/webhook_in_clusterhealthchecks.yaml
+#   target:
+#     group: healthcheck.io
+#     version: v1alpha1
+#     kind: ClusterHealthCheck
+# - path: patches/webhook_in_clusterhealthreports.yaml
+#   target:
+#     group: healthcheck.io
+#     version: v1alpha1
+#     kind: ClusterHealthReport
+#+kubebuilder:scaffold:crdkustomizewebhookpatch

@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- healthcheck_v1alpha1_clusterhealthcheck.yaml
+- healthcheck_v1alpha1_clusterhealthreport.yaml
+#+kubebuilder:scaffold:manifestskustomizesamples

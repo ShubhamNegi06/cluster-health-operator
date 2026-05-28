@@ -1,0 +1,32 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - healthcheck.healthcheck.io
+  resources:
+  - clusterhealthchecks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - healthcheck.healthcheck.io
+  resources:
+  - clusterhealthchecks/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - healthcheck.healthcheck.io
+  resources:
+  - clusterhealthchecks/status
+  verbs:
+  - get
+  - patch
+  - update

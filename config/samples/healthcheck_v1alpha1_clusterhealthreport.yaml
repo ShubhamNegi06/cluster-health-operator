@@ -1,0 +1,12 @@
+apiVersion: healthcheck.healthcheck.io/v1alpha1
+kind: ClusterHealthReport
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterhealthreport
+    app.kubernetes.io/instance: clusterhealthreport-sample
+    app.kubernetes.io/part-of: cluster-health-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: cluster-health-operator
+  name: clusterhealthreport-sample
+spec:
+  # TODO(user): Add fields here
