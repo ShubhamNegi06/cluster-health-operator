@@ -64,6 +64,24 @@ ClusterHealthReport CR (results)
 ▼
 Notifier (Email / Slack / Webhook)
 
+## Sample Output — Real OpenShift Cluster
+
+```
+NAME                          TRIGGEREDBY    OVERALLSTATUS   RUNTIME
+daily-health-20260529-021457  daily-health   OK              2026-05-29T02:14:57Z
+```
+Checks:
+API Server:      OK  — 3/3 pods running
+ClusterOperators:OK  — All 36 healthy
+Etcd:            OK  — 3/3 members running
+Leader: etcd-aro-lab-nk7b5-master-0
+InfraPods:       OK  — 99 pods across 7 namespaces
+MCPs:            OK  — master(3/3) worker(6/6)
+Nodes:           OK  — All 9 nodes healthy
+Overall: OK
+
+> Validated on OpenShift 4.x — 3 masters, 6 workers, 36 ClusterOperators
+
 ## Installation
 
 ### Prerequisites

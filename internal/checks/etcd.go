@@ -18,31 +18,30 @@ func RunEtcdCheck(
 
 	result := &healthcheckv1alpha1.EtcdCheckResult{Status: "OK"}
 
-	// Try OpenShift namespace first, fall back to kube-system
-	namespacesToTry := []string{"openshift-etcd", "kube-system"}
+	// Try all known etcd label combinations across OCP and vanilla K8s
+	searchTargets := []struct {
+		namespace string
+		labels    map[string]string
+	}{
+		// OpenShift 4.x — openshift-etcd namespace
+		{"openshift-etcd", map[string]string{"app": "etcd"}},
+		{"openshift-etcd", map[string]string{"k8s-app": "etcd"}},
+		// kubeadm / kind
+		{"kube-system", map[string]string{"component": "etcd"}},
+		{"kube-system", map[string]string{"tier": "control-plane", "component": "etcd"}},
+	}
 
 	var etcdPods []corev1.Pod
 
-	for _, ns := range namespacesToTry {
+	for _, target := range searchTargets {
 		podList := &corev1.PodList{}
 		if err := c.List(ctx, podList,
-			client.InNamespace(ns),
-			client.MatchingLabels{"component": "etcd"},
-		); err != nil || len(podList.Items) == 0 {
-			// try alternate label used by kubeadm/kind
-			podList2 := &corev1.PodList{}
-			_ = c.List(ctx, podList2,
-				client.InNamespace(ns),
-				client.MatchingLabels{"tier": "control-plane", "component": "etcd"},
-			)
-			if len(podList2.Items) > 0 {
-				etcdPods = append(etcdPods, podList2.Items...)
-				break
-			}
-			continue
+			client.InNamespace(target.namespace),
+			client.MatchingLabels(target.labels),
+		); err == nil && len(podList.Items) > 0 {
+			etcdPods = append(etcdPods, podList.Items...)
+			break
 		}
-		etcdPods = append(etcdPods, podList.Items...)
-		break
 	}
 
 	if len(etcdPods) == 0 {
@@ -58,13 +57,11 @@ func RunEtcdCheck(
 	for _, pod := range etcdPods {
 		podHealthy := true
 
-		// Check pod phase
 		if pod.Status.Phase != corev1.PodRunning {
 			podHealthy = false
 			result.Status = "Warning"
 		}
 
-		// Check container statuses
 		for _, cs := range pod.Status.ContainerStatuses {
 			if !cs.Ready {
 				podHealthy = false
@@ -78,7 +75,7 @@ func RunEtcdCheck(
 		if podHealthy {
 			healthyCount++
 			if leader == "" {
-				leader = pod.Name // first healthy pod noted as leader candidate
+				leader = pod.Name
 			}
 		}
 	}
@@ -86,7 +83,7 @@ func RunEtcdCheck(
 	result.HealthyMembers = healthyCount
 	result.Leader = leader
 
-	// Quorum check — majority must be healthy
+	// Quorum check
 	quorum := (result.MemberCount / 2) + 1
 	if healthyCount < quorum {
 		result.Status = "Critical"
