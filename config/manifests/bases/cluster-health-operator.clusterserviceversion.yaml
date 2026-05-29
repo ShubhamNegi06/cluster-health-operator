@@ -1,0 +1,46 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: cluster-health-operator.v0.1.1
+  namespace: placeholder
+  annotations:
+    capabilities: Basic Install
+    description: A unified cluster health check operator for OpenShift and Kubernetes
+    alm-examples: |
+      [{"apiVersion":"healthcheck.io/v1alpha1","kind":"ClusterHealthCheck","metadata":{"name":"daily-health"},"spec":{"schedule":"0 7 * * *","checks":{"etcd":{"enabled":true},"apiServer":{"enabled":true},"nodes":{"enabled":true},"clusterOperators":{"enabled":true},"mcps":{"enabled":true},"infraPods":{"enabled":true,"namespaces":["openshift-etcd","openshift-monitoring"]}},"reporting":{"storeReports":true,"retentionDays":30}}},{"apiVersion":"healthcheck.io/v1alpha1","kind":"ClusterHealthReport","metadata":{"name":"daily-health-sample"},"spec":{"triggeredBy":"daily-health"}}]
+spec:
+  displayName: Cluster Health Operator
+  description: |
+    cluster-health-operator provides scheduled health checks across all
+    critical cluster domains including etcd, API server, nodes,
+    ClusterOperators, MCPs, infra pods, and ArgoCD applications.
+  version: 0.1.1
+  minKubeVersion: 1.25.0
+  keywords:
+    - health
+    - monitoring
+    - openshift
+    - kubernetes
+  maintainers:
+    - name: Shubham Negi
+      email: your@email.com
+  provider:
+    name: Shubham Negi
+    url: https://github.com/ShubhamNegi06/cluster-health-operator
+  links:
+    - name: GitHub
+      url: https://github.com/ShubhamNegi06/cluster-health-operator
+    - name: Quay.io
+      url: https://quay.io/repository/shubh06/cluster-health-operator
+  icon:
+    - base64data: ""
+      mediatype: image/png
+  installModes:
+    - type: OwnNamespace
+      supported: true
+    - type: SingleNamespace
+      supported: false
+    - type: MultiNamespace
+      supported: false
+    - type: AllNamespaces
+      supported: true
