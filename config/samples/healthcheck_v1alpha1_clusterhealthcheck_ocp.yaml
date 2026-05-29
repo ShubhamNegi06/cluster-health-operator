@@ -1,0 +1,63 @@
+apiVersion: healthcheck.io/v1alpha1
+kind: ClusterHealthCheck
+metadata:
+  name: daily-health
+spec:
+  schedule: "0 7 * * *"
+
+  checks:
+    etcd:
+      enabled: true
+      dbSizeLimitMB: 4000
+      leaderChangesLimit: 5
+
+    apiServer:
+      enabled: true
+      latencyThresholdMs: 1000
+
+    nodes:
+      enabled: true
+      checkDiskPressure: true
+      checkMemoryPressure: true
+      checkPIDPressure: true
+      checkNotReady: true
+
+    clusterOperators:
+      enabled: true
+
+    mcps:
+      enabled: true
+
+    infraPods:
+      enabled: true
+      namespaces:
+        - openshift-etcd
+        - openshift-kube-apiserver
+        - openshift-ingress
+        - openshift-dns
+        - openshift-monitoring
+        - openshift-storage
+        - openshift-image-registry
+
+    argocd:
+      enabled: false
+      namespace: openshift-gitops
+      checkApplications: true
+      alertOn:
+        - Degraded
+        - Unknown
+
+    customProjects:
+      enabled: false
+
+  notifications:
+    email:
+      enabled: false
+    slack:
+      enabled: false
+    webhook:
+      enabled: false
+
+  reporting:
+    storeReports: true
+    retentionDays: 30
